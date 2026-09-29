@@ -1,0 +1,36 @@
+[project]
+name = "clinical-evidence-agent"
+version = "0.1.0"
+description = "Agentic clinical evidence and workflow MVP"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115,<1.0",
+  "uvicorn[standard]>=0.34,<1.0",
+  "pydantic>=2.10,<3.0",
+  "pydantic-settings>=2.7,<3.0",
+  "httpx>=0.28,<1.0",
+  "ollama>=0.5,<1.0",
+  "tenacity>=9.0,<10.0",
+]
+
+[project.optional-dependencies]
+all = [
+  "langgraph>=0.3,<2.0",
+  "google-genai>=1.0,<2.0",
+  "pytest>=8.3,<9.0",
+  "pytest-asyncio>=0.25,<1.0",
+]
+
+test = [
+  "pytest>=8.3,<9.0",
+  "pytest-asyncio>=0.25,<1.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+pythonpath = [".", "./backend"]
+testpaths = ["../tests"]
+asyncio_mode = "auto"
