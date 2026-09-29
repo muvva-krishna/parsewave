@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parsewave — Clinical Evidence Agent</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+    body { margin: 0; background: #f6f7f9; color: #101828; }
+    main { max-width: 900px; margin: 0 auto; padding: 48px 20px; }
+    .hero { margin-bottom: 28px; }
+    .eyebrow { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #667085; }
+    h1 { font-size: clamp(32px, 5vw, 52px); line-height: 1.05; margin: 10px 0; }
+    p { color: #475467; }
+    textarea { width: 100%; box-sizing: border-box; min-height: 150px; border: 1px solid #d0d5dd; border-radius: 14px; padding: 16px; font: inherit; resize: vertical; background: white; }
+    button { margin-top: 12px; border: 0; border-radius: 12px; padding: 12px 18px; font: inherit; font-weight: 600; cursor: pointer; background: #111827; color: white; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    .panel { margin-top: 22px; border: 1px solid #e4e7ec; border-radius: 16px; background: white; padding: 18px; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; font-size: 13px; }
+    .status { margin-top: 12px; font-size: 14px; color: #667085; }
+  </style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <div class="eyebrow">Parsewave</div>
+    <h1>Clinical Evidence Agent</h1>
+    <p>Evidence-first clinical workflows with typed agent outputs.</p>
+  </section>
+
+  <textarea id="query" placeholder="Ask a clinical question..."></textarea>
+  <button id="ask" disabled>Ask the agent</button>
+  <div class="status" id="status">Enter a question with at least 3 characters.</div>
+
+  <section class="panel" id="result" hidden>
+    <pre id="output"></pre>
+  </section>
+</main>
+
+<script>
+  const query = document.getElementById("query");
+  const button = document.getElementById("ask");
+  const status = document.getElementById("status");
+  const result = document.getElementById("result");
+  const output = document.getElementById("output");
+
+  query.addEventListener("input", () => {
+    button.disabled = query.value.trim().length < 3;
+    if (button.disabled) status.textContent = "Enter a question with at least 3 characters.";
+  });
+
+  button.addEventListener("click", async () => {
+    button.disabled = true;
+    status.textContent = "Running clinical evidence workflow…";
+    result.hidden = true;
+
+    try {
+      const response = await fetch("/api/ask", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({query: query.value.trim()})
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || "Request failed");
+      output.textContent = JSON.stringify(data, null, 2);
+      result.hidden = false;
+      status.textContent = "Completed.";
+    } catch (error) {
+      status.textContent = error instanceof Error ? error.message : "Request failed";
+    } finally {
+      button.disabled = query.value.trim().length < 3;
+    }
+  });
+</script>
+</body>
+</html>
