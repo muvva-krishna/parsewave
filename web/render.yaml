@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: parsewave-clinical-agent
+    runtime: docker
+    dockerfilePath: ./web/Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
